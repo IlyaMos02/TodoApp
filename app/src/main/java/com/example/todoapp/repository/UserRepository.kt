@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.todoapp.model.User
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.local.QueryResult
 
 class UserRepository {
 
@@ -12,13 +13,19 @@ class UserRepository {
     private val userDbRef = firestoreDb.collection("users")
 
     fun createUser(user: User){
-        userDbRef.add(user)
-            .addOnSuccessListener { documentReference ->
-                Log.d(ContentValues.TAG, "DocumentSnapshot written with ID: ${documentReference.id}")
-            }
-            .addOnFailureListener { e ->
-                Log.w(ContentValues.TAG, "Error adding document", e)
-            }
+        val task = userDbRef.whereEqualTo("user_code", user.user_code).get()
+
+        if(task.isSuccessful){
+            Log.w(ContentValues.TAG, "This user is already added")
+        } else {
+            userDbRef.add(user)
+                .addOnSuccessListener { documentReference ->
+                    Log.d(ContentValues.TAG, "DocumentSnapshot written with ID: ${documentReference.id}")
+                }
+                .addOnFailureListener { e ->
+                    Log.w(ContentValues.TAG, "Error adding document", e)
+                }
+        }
     }
 
     companion object{
@@ -26,4 +33,4 @@ class UserRepository {
     }
 }
 
-fun mapFromFirebaseUser(user: FirebaseUser) = User(user.uid)
+fun mapFromFirebaseUser(user: FirebaseUser) = User(user_code = user.uid)

@@ -4,7 +4,6 @@ import android.os.Parcelable
 import com.google.firebase.firestore.DocumentId
 import kotlinx.parcelize.Parcelize
 import java.text.DateFormat
-
 @Parcelize
 data class Task(
     @DocumentId

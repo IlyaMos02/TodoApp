@@ -7,5 +7,6 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class User (
     @DocumentId
-    val uid: String = ""
+    val uid: String = "",
+    val user_code: String = ""
 ) : Parcelable

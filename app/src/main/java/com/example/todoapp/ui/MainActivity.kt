@@ -3,7 +3,9 @@ package com.example.todoapp.ui
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.todoapp.R
+import com.example.todoapp.model.Task
 import com.example.todoapp.model.User
+import com.example.todoapp.repository.TaskRepository
 import com.example.todoapp.repository.UserRepository
 import com.example.todoapp.repository.mapFromFirebaseUser
 import com.example.todoapp.ui.login.LoginFragment

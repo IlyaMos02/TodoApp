@@ -12,13 +12,24 @@ import com.example.todoapp.model.Task
 import com.example.todoapp.repository.TaskRepository
 import com.example.todoapp.repository.UserRepository
 import com.example.todoapp.utils.OnQueryTextChanged
-import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.google.firebase.firestore.Query
 
 class TasksFragment() : Fragment() {
     private lateinit var binding: FragmentTasksBinding
-    private lateinit var taskAdapter: TasksAdapter
-    private lateinit var tasks: MutableLiveData<List<Task>>
+
+    private lateinit var query: Query //= TaskRepository().getTasks(UserRepository.currentUser!!.user_code)
+    private lateinit var options:FirestoreRecyclerOptions<Task> /*= FirestoreRecyclerOptions.Builder<Task>()
+        .setLifecycleOwner(this)
+        .setQuery(query, Task::class.java)
+        .build()*/
+    private lateinit var taskAdapter: TasksAdapter/* = TasksAdapter(options, object : TasksAdapter.OnItemClickListener{
+        override fun onItemClick(task: Task) {
+
+        }})*/
+
+    //private var searchStr = MutableLiveData("")
+    //private var searchStr: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,15 +45,25 @@ class TasksFragment() : Fragment() {
 
         //AuthUI.getInstance().signOut(requireContext())
 
+        /*val taskR = TaskRepository()
+        taskR.createTask(Task(name = "Call mom", important = true))
+        taskR.createTask(Task(name = "Breakfast", completed = true))
+        taskR.createTask(Task(name = "Homework"))
+        taskR.createTask(Task(name = "Pool", completed = true))*/
+
         initRecyclerView()
 
         setHasOptionsMenu(true)
     }
 
     private fun initRecyclerView() {
-        val options = FirestoreRecyclerOptions.Builder<Task>()
+        query = TaskRepository().getTasks(UserRepository.currentUser!!.user_code)
+
+        TaskRepository().getT()
+
+        options = FirestoreRecyclerOptions.Builder<Task>()
             .setLifecycleOwner(this)
-            .setQuery(TaskRepository().getTasks(), Task::class.java)
+            .setQuery(query, Task::class.java)
             .build()
 
         taskAdapter = TasksAdapter(options, object : TasksAdapter.OnItemClickListener{
@@ -67,9 +88,19 @@ class TasksFragment() : Fragment() {
         val searchItem = menu.findItem(R.id.action_search)
         val searchView = searchItem.actionView as SearchView
 
-        searchView.OnQueryTextChanged {searchStr ->
-            TaskRepository().getTasks(UserRepository.currentUser!!.uid, searchStr)
+        searchView.OnQueryTextChanged {searchInput ->
+            updateOptions(searchInput)
         }
+    }
+
+    fun updateOptions(str: String){
+
+        query = TaskRepository().getTasks(UserRepository.currentUser!!.user_code, str)
+        options = FirestoreRecyclerOptions.Builder<Task>()
+            .setLifecycleOwner(this)
+            .setQuery(query, Task::class.java)
+            .build()
+        taskAdapter.updateOptions(options)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

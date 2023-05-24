@@ -8,11 +8,12 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 
 class TasksAdapter(
-    private val options: FirestoreRecyclerOptions<Task>,
+    /*private val options: FirestoreRecyclerOptions<Task>,*/
     private val onItemClickListener: OnItemClickListener
-) : FirestoreRecyclerAdapter<Task, TasksViewHolder>(options) {
+)/* : FirestoreRecyclerAdapter<Task, TasksViewHolder>(options)*/ {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TasksViewHolder {
+
+    /*override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TasksViewHolder {
         val holder = TasksViewHolder(
             LayoutInflater.from(parent.context).inflate(
                 R.layout.item_task,
@@ -23,12 +24,12 @@ class TasksAdapter(
 
         holder.itemView.setOnClickListener {
             onItemClickListener.onItemClick(
-                options.snapshots[holder.absoluteAdapterPosition]
+                //options.snapshots[holder.absoluteAdapterPosition]
             )
         }
 
         return holder
-    }
+    }*/
 
     override fun onBindViewHolder(holder: TasksViewHolder, position: Int, task: Task) {
         holder.bind(task)
