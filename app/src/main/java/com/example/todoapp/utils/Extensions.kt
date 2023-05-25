@@ -11,7 +11,7 @@ fun AppCompatActivity.replaceFragment(container: Int, fragment: Fragment, tag: S
         .commit()
 }
 
-fun SearchView.OnQueryTextChanged(listener: (String) -> Unit){
+inline fun SearchView.OnQueryTextChanged(crossinline listener: (String) -> Unit){
     this.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
         override fun onQueryTextSubmit(query: String?): Boolean {
              return true

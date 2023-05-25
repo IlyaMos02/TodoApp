@@ -10,7 +10,7 @@ import com.example.todoapp.repository.UserRepository
 import com.example.todoapp.repository.mapFromFirebaseUser
 import com.example.todoapp.ui.login.LoginFragment
 import com.example.todoapp.ui.login.OnAuthStateListener
-import com.example.todoapp.ui.main.TasksFragment
+import com.example.todoapp.ui.task.TasksFragment
 import com.example.todoapp.utils.replaceFragment
 import com.google.firebase.auth.FirebaseAuth
 
