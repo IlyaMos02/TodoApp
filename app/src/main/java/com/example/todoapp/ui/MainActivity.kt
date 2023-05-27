@@ -2,6 +2,10 @@ package com.example.todoapp.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.todoapp.R
 import com.example.todoapp.model.Task
 import com.example.todoapp.model.User
@@ -14,34 +18,20 @@ import com.example.todoapp.ui.task.TasksFragment
 import com.example.todoapp.utils.replaceFragment
 import com.google.firebase.auth.FirebaseAuth
 
-class MainActivity : AppCompatActivity(), OnAuthStateListener {
+class MainActivity : AppCompatActivity(){
+    private lateinit var navController: NavController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        showFragment()
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment
+        navController = navHostFragment.findNavController()
+
+        setupActionBarWithNavController(navController)
     }
 
-    override fun onBackPressed() {
-        if(supportFragmentManager.backStackEntryCount == 0){
-            finish()
-        } else {
-            super.onBackPressed()
-        }
-    }
-
-    private fun showFragment(){
-        val user = FirebaseAuth.getInstance().currentUser
-
-        if(user == null){
-            replaceFragment(R.id.fragmentContainer, LoginFragment())
-        } else {
-            UserRepository.currentUser = mapFromFirebaseUser(user)
-            replaceFragment(R.id.fragmentContainer, TasksFragment())
-        }
-    }
-
-    override fun onAuthStateChanged() {
-        showFragment()
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 }

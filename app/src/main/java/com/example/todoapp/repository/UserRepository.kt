@@ -13,9 +13,9 @@ class UserRepository {
     private val userDbRef = firestoreDb.collection("users")
 
     fun createUser(user: User){
-        val task = userDbRef.whereEqualTo("user_code", user.user_code).get()
+        val taskNum = userDbRef.whereEqualTo("user_code", user.user_code).get().result.documents.size
 
-        if(task.isSuccessful){
+        if(taskNum > 0){
             Log.w(ContentValues.TAG, "This user is already added")
         } else {
             userDbRef.add(user)

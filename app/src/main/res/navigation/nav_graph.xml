@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_tasksFragment_to_addEditTaskFragment"
             app:destination="@id/addEditTaskFragment" />
+        <action
+            android:id="@+id/action_tasksFragment_to_loginFragment2"
+            app:destination="@id/loginFragment2" />
     </fragment>
     <fragment
         android:id="@+id/addEditTaskFragment"
@@ -24,5 +27,16 @@
             app:argType="com.example.todoapp.model.Task"
             app:nullable="true"
             android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_addEditTaskFragment_to_tasksFragment"
+            app:destination="@id/tasksFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginFragment2"
+        android:name="com.example.todoapp.ui.login.LoginFragment"
+        android:label="LoginFragment" >
+        <action
+            android:id="@+id/action_loginFragment2_to_tasksFragment"
+            app:destination="@id/tasksFragment" />
     </fragment>
 </navigation>

@@ -8,11 +8,10 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-class TasksViewModel(private val taskRepository: TaskRepository) : ViewModel() {
+class TasksViewModel(private val taskRepository: TaskRepository,
+                     private val state:SavedStateHandle
+                     ) : ViewModel() {
     val tasksLiveData = taskRepository.tasks
-    /*init {
-        taskRepository.tasks.value?.map { it.copy() }?.let { tasksList.addAll(it) }
-    }*/
 
     private val tasksEventChannel = Channel<TasksEvent>()
     val tasksEvent = tasksEventChannel.receiveAsFlow()
@@ -31,7 +30,9 @@ class TasksViewModel(private val taskRepository: TaskRepository) : ViewModel() {
     }
 
     fun onTaskSelected(task: Task){
-
+        viewModelScope.launch {
+            tasksEventChannel.send(TasksEvent.NavigateToEditTaskScreen(task))
+        }
     }
 
     fun onTaskChecked(task: Task, isChecked: Boolean){
@@ -53,12 +54,21 @@ class TasksViewModel(private val taskRepository: TaskRepository) : ViewModel() {
         }
     }
 
+    fun onAddNewTaskClick(){
+        viewModelScope.launch {
+            tasksEventChannel.send(TasksEvent.NavigateToAddTaskScreen)
+        }
+    }
+
     sealed class TasksEvent {
+        object NavigateToAddTaskScreen : TasksEvent()
+        data class NavigateToEditTaskScreen(val task: Task) : TasksEvent()
         data class ShowUndoDeleteTaskMessage(val task: Task) : TasksEvent()
     }
-    class TasksViewModelFactory(private val repository: TaskRepository) : ViewModelProvider.Factory{
+    class TasksViewModelFactory(private val repository: TaskRepository,
+                                private val savedStateHandle: SavedStateHandle) : ViewModelProvider.Factory{
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return TasksViewModel(repository) as T
+            return TasksViewModel(repository, savedStateHandle) as T
         }
     }
 }

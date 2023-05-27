@@ -9,15 +9,15 @@ import com.example.todoapp.ui.task.TasksViewModel
 
 class AddEditTaskViewModel(
     private val taskRepository: TaskRepository,
-    private val state: SavedStateHandle
 ) : ViewModel() {
 
-    val tasks = state.get<Task>("task")
+    fun onSaveClick(task: Task){
 
+    }
 
-    class AddEditTaskViewModelFactory(private val repository: TaskRepository, private val state: SavedStateHandle) : ViewModelProvider.Factory{
+    class AddEditTaskViewModelFactory(private val repository: TaskRepository) : ViewModelProvider.Factory{
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return AddEditTaskViewModel(repository, state) as T
+            return AddEditTaskViewModel(repository) as T
         }
     }
 }

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.todoapp.R
 import com.example.todoapp.model.Task
 import com.example.todoapp.repository.TaskRepository
@@ -61,7 +62,9 @@ class LoginFragment : Fragment() {
 
                 UserRepository().createUser(mapFromFirebaseUser(it))
                 UserRepository.currentUser = mapFromFirebaseUser(it)
-                authStateListener?.onAuthStateChanged()
+                //authStateListener?.onAuthStateChanged()
+                val action = LoginFragmentDirections.actionLoginFragment2ToTasksFragment()
+                findNavController().navigate(action)
             } ?: Toast.makeText(requireContext(), "Login error", Toast.LENGTH_SHORT).show()
 
         } else {

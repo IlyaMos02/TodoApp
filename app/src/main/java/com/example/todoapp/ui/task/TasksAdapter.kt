@@ -22,15 +22,15 @@ class TasksAdapter(private val listener: OnItemClickListener): RecyclerView.Adap
                 root.setOnClickListener {
                     val position = absoluteAdapterPosition
                     if(position != RecyclerView.NO_POSITION){
-                        val task = differ.currentList[position]
-                        listener.onItemClick(task)
+                        val cTask = differ.currentList[position]
+                        listener.onItemClick(cTask)
                     }
                 }
                 checkBoxCompleted.setOnClickListener {
                     val position = absoluteAdapterPosition
                     if(position != RecyclerView.NO_POSITION){
-                        val task = differ.currentList[position]
-                        listener.onCheckBoxClick(task, checkBoxCompleted.isChecked)
+                        val cTask = differ.currentList[position]
+                        listener.onCheckBoxClick(cTask, checkBoxCompleted.isChecked)
                     }
                 }
             }
@@ -56,12 +56,6 @@ class TasksAdapter(private val listener: OnItemClickListener): RecyclerView.Adap
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TasksViewHolder {
         val binding = ItemTaskBinding.inflate(LayoutInflater.from(parent.context), parent, false)//LayoutInflater.from(parent.context).inflate(R.layout.item_task, parent, false)
 
-        /*holder.itemView.setOnClickListener {
-            onItemClickListener.onItemClick(
-                //options.snapshots[holder.absoluteAdapterPosition]
-            )
-        }*/
-
         return TasksViewHolder(binding)
     }
 
@@ -70,10 +64,6 @@ class TasksAdapter(private val listener: OnItemClickListener): RecyclerView.Adap
     override fun onBindViewHolder(holder: TasksViewHolder, position: Int) {
         val task = differ.currentList[position]
         holder.bind(task)
-
-        holder.itemView.setOnClickListener {
-
-        }
     }
 
     interface OnItemClickListener {

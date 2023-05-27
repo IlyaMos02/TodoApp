@@ -5,9 +5,9 @@ import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,15 +15,17 @@ import com.example.todoapp.R
 import com.example.todoapp.databinding.FragmentTasksBinding
 import com.example.todoapp.model.Task
 import com.example.todoapp.repository.TaskRepository
-import com.example.todoapp.utils.OnQueryTextChanged
+import com.example.todoapp.repository.UserRepository
+import com.example.todoapp.repository.mapFromFirebaseUser
+import com.example.todoapp.utils.onQueryTextChanged
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.flow.collect
+import com.google.firebase.auth.FirebaseAuth
 
 class TasksFragment() : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemClickListener {
     private lateinit var binding: FragmentTasksBinding
     private lateinit var taskAdapter: TasksAdapter
     private val viewModel: TasksViewModel by viewModels() {
-        TasksViewModel.TasksViewModelFactory(TaskRepository())
+        TasksViewModel.TasksViewModelFactory(TaskRepository(), SavedStateHandle())
     }
 
     override fun onCreateView(
@@ -32,6 +34,16 @@ class TasksFragment() : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemCl
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentTasksBinding.inflate(layoutInflater, container, false)
+
+        val user = FirebaseAuth.getInstance().currentUser
+
+        if(user == null){
+            val action = TasksFragmentDirections.actionTasksFragmentToLoginFragment2()
+            findNavController().navigate(action)
+        } else {
+            UserRepository.currentUser = mapFromFirebaseUser(user)
+        }
+
         return binding.root
     }
 
@@ -71,6 +83,10 @@ class TasksFragment() : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemCl
                     viewModel.onTaskSwiped(task)
                 }
             }).attachToRecyclerView(recyclerViewTasks)
+
+            fabAddTask.setOnClickListener{
+                viewModel.onAddNewTaskClick()
+            }
         }
 
         viewModel.tasksLiveData.observe(viewLifecycleOwner){
@@ -86,9 +102,18 @@ class TasksFragment() : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemCl
                                 viewModel.onUndoDeleteClick(event.task)
                             }.show()
                     }
+                    is TasksViewModel.TasksEvent.NavigateToAddTaskScreen -> {
+                        val action = TasksFragmentDirections.actionTasksFragmentToAddEditTaskFragment()
+                        findNavController().navigate(action)
+                    }
+                    is TasksViewModel.TasksEvent.NavigateToEditTaskScreen -> {
+                        val action = TasksFragmentDirections.actionTasksFragmentToAddEditTaskFragment(event.task)
+                        findNavController().navigate(action)
+                    }
                 }
             }
         }
+
 
         setHasOptionsMenu(true)
     }
@@ -107,14 +132,9 @@ class TasksFragment() : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemCl
         val searchItem = menu.findItem(R.id.action_search)
         val searchView = searchItem.actionView as SearchView
 
-        searchView.OnQueryTextChanged {searchInput ->
+        searchView.onQueryTextChanged { searchInput ->
             val result = viewModel.getTasks(searchInput)
             viewModel.tasksLiveData.postValue(result)
-
-            /*viewModel.allTasks.value = viewModel.allTasks.value?.filter {
-                it.name.contains(searchInput)
-            }*/
-
         }
     }
 

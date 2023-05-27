@@ -1,17 +1,21 @@
 package com.example.todoapp.utils
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 
-fun AppCompatActivity.replaceFragment(container: Int, fragment: Fragment, tag: String = fragment.javaClass.simpleName){
-    val transaction = supportFragmentManager
-        .beginTransaction()
-        .replace(container, fragment, tag)
-        .commit()
-}
+fun Fragment.relaunch(){
+    val packageName = requireContext().packageName
+    val launchIntent = requireContext().packageManager.getLaunchIntentForPackage(packageName)
 
-inline fun SearchView.OnQueryTextChanged(crossinline listener: (String) -> Unit){
+    if (launchIntent != null) {
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(launchIntent)
+    }
+
+    requireActivity().finish()
+}
+inline fun SearchView.onQueryTextChanged(crossinline listener: (String) -> Unit){
     this.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
         override fun onQueryTextSubmit(query: String?): Boolean {
              return true

@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'com.google.gms.google-services'
     id 'kotlin-parcelize'
+    id 'androidx.navigation.safeargs.kotlin'
 }
 
 android {
@@ -44,10 +45,8 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-auth:8.0.2'
     implementation 'com.firebaseui:firebase-ui-firestore:8.0.2'
 
-    //implementation 'com.google.firebase:firebase-storage-ktx:20.2.0'
     implementation 'com.google.firebase:firebase-auth:22.0.0'
     implementation 'com.google.firebase:firebase-firestore-ktx:24.6.0'
-
 
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
