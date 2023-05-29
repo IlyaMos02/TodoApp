@@ -39,4 +39,8 @@
             android:id="@+id/action_loginFragment2_to_tasksFragment"
             app:destination="@id/tasksFragment" />
     </fragment>
+    <dialog
+        android:id="@+id/deleteAllCompletedDialogFragment"
+        android:name="com.example.todoapp.ui.deleteallcompleted.DeleteAllCompletedDialogFragment"
+        android:label="DeleteAllCompletedDialogFragment" /><action android:id="@+id/action_global_deleteAllCompletedDialogFragment" app:destination="@id/deleteAllCompletedDialogFragment"/>
 </navigation>

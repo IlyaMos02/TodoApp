@@ -1,5 +1,6 @@
 package com.example.todoapp.ui
 
+import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.navigation.NavController
@@ -7,16 +8,6 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.todoapp.R
-import com.example.todoapp.model.Task
-import com.example.todoapp.model.User
-import com.example.todoapp.repository.TaskRepository
-import com.example.todoapp.repository.UserRepository
-import com.example.todoapp.repository.mapFromFirebaseUser
-import com.example.todoapp.ui.login.LoginFragment
-import com.example.todoapp.ui.login.OnAuthStateListener
-import com.example.todoapp.ui.task.TasksFragment
-import com.example.todoapp.utils.replaceFragment
-import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity(){
     private lateinit var navController: NavController
@@ -35,3 +26,6 @@ class MainActivity : AppCompatActivity(){
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
 }
+
+const val ADD_TASK_RESULT_OK = Activity.RESULT_FIRST_USER
+const val EDIT_TASK_RESULT_OK = Activity.RESULT_FIRST_USER + 1

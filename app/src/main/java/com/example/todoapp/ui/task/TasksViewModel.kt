@@ -3,30 +3,42 @@ package com.example.todoapp.ui.task
 import androidx.lifecycle.*
 import com.example.todoapp.model.Task
 import com.example.todoapp.repository.TaskRepository
-import com.google.firebase.auth.FirebaseAuth
+import com.example.todoapp.ui.ADD_TASK_RESULT_OK
+import com.example.todoapp.ui.EDIT_TASK_RESULT_OK
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-class TasksViewModel(private val taskRepository: TaskRepository,
-                     private val state:SavedStateHandle
+class TasksViewModel(private val taskRepository: TaskRepository
                      ) : ViewModel() {
     val tasksLiveData = taskRepository.tasks
+
+    var searchQuery: String = ""
+    var hideCompleted = false
 
     private val tasksEventChannel = Channel<TasksEvent>()
     val tasksEvent = tasksEventChannel.receiveAsFlow()
 
-    fun getTasks(name: String): List<Task>? {
-        return if(name == ""){
-            taskRepository.tasks.value
-        } else{
-            val returns = taskRepository.tasks.value?.map { it.copy() }
-            returns?.filter {
-                it.user_id == FirebaseAuth.getInstance().currentUser!!.uid &&
-                        it.name.contains(name, true)
-            }
-        }
+    fun onTaskSearched(searchStr: String) {
+        taskRepository.getTasksByName(searchStr)
+    }
 
+    fun onSortTasksByDate(){
+        viewModelScope.launch {
+            taskRepository.getTasksSortedByDate()
+        }
+    }
+
+    fun onSortTasksByName(){
+        viewModelScope.launch {
+            taskRepository.getTasksSortedByName()
+        }
+    }
+
+    fun onSortTasksByImportance(){
+        viewModelScope.launch {
+            taskRepository.getTasksSortedByImportance()
+        }
     }
 
     fun onTaskSelected(task: Task){
@@ -60,15 +72,43 @@ class TasksViewModel(private val taskRepository: TaskRepository,
         }
     }
 
+    fun onAddEditResult(result: Int){
+        when(result){
+            ADD_TASK_RESULT_OK -> showTaskSavedConfirmationMessage("Task added")
+            EDIT_TASK_RESULT_OK -> showTaskSavedConfirmationMessage("Task updated")
+        }
+    }
+
+    fun onDeleteAllCompletedClick(){
+        viewModelScope.launch {
+            tasksEventChannel.send(TasksEvent.NavigateToDeleteAllCompletedScreen)
+        }
+    }
+
+    private fun showTaskSavedConfirmationMessage(msg: String) {
+        viewModelScope.launch {
+            tasksEventChannel.send(TasksEvent.ShowTaskSavedConfirmationMessage(msg))
+        }
+    }
+
+
+    companion object{
+        val SORT_BY_NAME = "Sort by name"
+        val SORT_BY_DATE_CREATED = "Sort by date created"
+        val SORT_BY_IMPORTANCE = "Sort by importance"
+        val HIDE_COMPLETED = "Hide completed"
+        val DELETE_ALL_COMPLETED = "Delete all completed"
+    }
     sealed class TasksEvent {
         object NavigateToAddTaskScreen : TasksEvent()
         data class NavigateToEditTaskScreen(val task: Task) : TasksEvent()
         data class ShowUndoDeleteTaskMessage(val task: Task) : TasksEvent()
+        data class ShowTaskSavedConfirmationMessage(val msg: String) : TasksEvent()
+        object NavigateToDeleteAllCompletedScreen: TasksEvent()
     }
-    class TasksViewModelFactory(private val repository: TaskRepository,
-                                private val savedStateHandle: SavedStateHandle) : ViewModelProvider.Factory{
+    class TasksViewModelFactory(private val repository: TaskRepository) : ViewModelProvider.Factory{
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return TasksViewModel(repository, savedStateHandle) as T
+            return TasksViewModel(repository) as T
         }
     }
 }

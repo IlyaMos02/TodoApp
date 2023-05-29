@@ -15,7 +15,6 @@
         app:showAsAction="always">
 
         <menu>
-
             <item
                 android:id="@+id/action_sort_by_name"
                 android:title="Sort by name"/>
@@ -23,6 +22,10 @@
             <item
                 android:id="@+id/action_sort_by_date_created"
                 android:title="Sort by date created"/>
+
+            <item
+                android:id="@+id/action_sort_by_importance"
+                android:title="Sort by importance"/>
 
         </menu>
 

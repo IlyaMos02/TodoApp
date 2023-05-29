@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.lifecycleScope
@@ -18,6 +20,7 @@ import com.example.todoapp.repository.TaskRepository
 import com.example.todoapp.repository.UserRepository
 import com.example.todoapp.repository.mapFromFirebaseUser
 import com.example.todoapp.utils.onQueryTextChanged
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 
@@ -25,8 +28,9 @@ class TasksFragment() : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemCl
     private lateinit var binding: FragmentTasksBinding
     private lateinit var taskAdapter: TasksAdapter
     private val viewModel: TasksViewModel by viewModels() {
-        TasksViewModel.TasksViewModelFactory(TaskRepository(), SavedStateHandle())
+        TasksViewModel.TasksViewModelFactory(TaskRepository())
     }
+    private lateinit var searchView: SearchView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -89,6 +93,11 @@ class TasksFragment() : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemCl
             }
         }
 
+        setFragmentResultListener("add_edit_request"){_, bundle ->
+            val result = bundle.getInt("add_edit_request")
+            viewModel.onAddEditResult(result)
+        }
+
         viewModel.tasksLiveData.observe(viewLifecycleOwner){
             taskAdapter.differ.submitList(it)
         }
@@ -108,6 +117,13 @@ class TasksFragment() : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemCl
                     }
                     is TasksViewModel.TasksEvent.NavigateToEditTaskScreen -> {
                         val action = TasksFragmentDirections.actionTasksFragmentToAddEditTaskFragment(event.task)
+                        findNavController().navigate(action)
+                    }
+                    is TasksViewModel.TasksEvent.ShowTaskSavedConfirmationMessage -> {
+                        Snackbar.make(requireView(), event.msg, Snackbar.LENGTH_SHORT).show()
+                    }
+                    is TasksViewModel.TasksEvent.NavigateToDeleteAllCompletedScreen -> {
+                        val action = TasksFragmentDirections.actionGlobalDeleteAllCompletedDialogFragment()
                         findNavController().navigate(action)
                     }
                 }
@@ -130,34 +146,48 @@ class TasksFragment() : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemCl
         inflater.inflate(R.menu.menu_fragment_tasks, menu)
 
         val searchItem = menu.findItem(R.id.action_search)
-        val searchView = searchItem.actionView as SearchView
+        searchView = searchItem.actionView as SearchView
+
+        val pendingQuery = viewModel.searchQuery
+        if(pendingQuery.isNotEmpty() && pendingQuery != null){
+            searchItem.expandActionView()
+            searchView.setQuery(pendingQuery, false)
+        }
 
         searchView.onQueryTextChanged { searchInput ->
-            val result = viewModel.getTasks(searchInput)
-            viewModel.tasksLiveData.postValue(result)
+            viewModel.onTaskSearched(searchInput)
         }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId){
-            R.id.action_sort_by_name -> {
-
+        return when(item.title){
+            TasksViewModel.SORT_BY_NAME -> {
+                viewModel.onSortTasksByName()
                 true
             }
-            R.id.action_sort_by_date_created -> {
-
+            TasksViewModel.SORT_BY_DATE_CREATED -> {
+                viewModel.onSortTasksByDate()
                 true
             }
-            R.id.action_hide_completed_tasks -> {
+            TasksViewModel.SORT_BY_IMPORTANCE -> {
+                viewModel.onSortTasksByImportance()
+                true
+            }
+            TasksViewModel.HIDE_COMPLETED -> {
                 item.isChecked = !item.isChecked
 
                 true
             }
-            R.id.action_delete_all_completed_tasks -> {
-
+            TasksViewModel.DELETE_ALL_COMPLETED -> {
+                viewModel.onDeleteAllCompletedClick()
                 true
             }
             else -> super.onContextItemSelected(item)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        searchView.setOnQueryTextListener(null)
     }
 }
