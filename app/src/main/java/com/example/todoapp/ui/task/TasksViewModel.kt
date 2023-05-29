@@ -104,6 +104,7 @@ class TasksViewModel(private val taskRepository: TaskRepository
         val SORT_BY_IMPORTANCE = "Sort by importance"
         val HIDE_COMPLETED = "Hide completed"
         val DELETE_ALL_COMPLETED = "Delete all completed"
+        val EXIT_FROM_ACCOUNT = "Exit"
     }
     sealed class TasksEvent {
         object NavigateToAddTaskScreen : TasksEvent()

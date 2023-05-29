@@ -17,10 +17,8 @@ import com.example.todoapp.R
 import com.example.todoapp.databinding.FragmentTasksBinding
 import com.example.todoapp.model.Task
 import com.example.todoapp.repository.TaskRepository
-import com.example.todoapp.repository.UserRepository
-import com.example.todoapp.repository.mapFromFirebaseUser
 import com.example.todoapp.utils.onQueryTextChanged
-import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.firebase.ui.auth.AuthUI
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 
@@ -39,15 +37,6 @@ class TasksFragment() : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemCl
     ): View {
         binding = FragmentTasksBinding.inflate(layoutInflater, container, false)
 
-        val user = FirebaseAuth.getInstance().currentUser
-
-        if(user == null){
-            val action = TasksFragmentDirections.actionTasksFragmentToLoginFragment2()
-            findNavController().navigate(action)
-        } else {
-            UserRepository.currentUser = mapFromFirebaseUser(user)
-        }
-
         return binding.root
     }
 
@@ -55,12 +44,6 @@ class TasksFragment() : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemCl
         super.onViewCreated(view, savedInstanceState)
 
         //AuthUI.getInstance().signOut(requireContext())
-
-        /*val taskR = TaskRepository()
-        taskR.createTask(Task(name = "Call mom", important = true))
-        taskR.createTask(Task(name = "Breakfast", completed = true))
-        taskR.createTask(Task(name = "Homework"))
-        taskR.createTask(Task(name = "Pool", completed = true))*/
 
         taskAdapter = TasksAdapter(this)
 
@@ -187,6 +170,14 @@ class TasksFragment() : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemCl
             }
             TasksViewModel.DELETE_ALL_COMPLETED -> {
                 viewModel.onDeleteAllCompletedClick()
+                true
+            }
+            TasksViewModel.EXIT_FROM_ACCOUNT -> {
+                AuthUI.getInstance().signOut(requireContext()).addOnSuccessListener {
+                    val action = TasksFragmentDirections.actionTasksFragmentToLoginFragment2()
+                    findNavController().navigate(action)
+                    parentFragmentManager.beginTransaction().remove(this).commit()
+                }
                 true
             }
             else -> super.onContextItemSelected(item)

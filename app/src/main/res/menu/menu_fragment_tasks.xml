@@ -42,4 +42,9 @@
         android:title="Delete all completed"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_exit_from_account"
+        android:title="Exit"
+        app:showAsAction="never"/>
+
 </menu>

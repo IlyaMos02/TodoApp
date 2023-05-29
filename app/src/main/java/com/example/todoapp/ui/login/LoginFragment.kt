@@ -7,10 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.todoapp.R
-import com.example.todoapp.model.Task
-import com.example.todoapp.repository.TaskRepository
-import com.example.todoapp.repository.UserRepository
-import com.example.todoapp.repository.mapFromFirebaseUser
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
@@ -22,6 +18,11 @@ class LoginFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         doLogin()
+        val user = FirebaseAuth.getInstance().currentUser
+        if(user != null){
+            val action = LoginFragmentDirections.actionLoginFragment2ToTasksFragment()
+            findNavController().navigate(action)
+        }
     }
 
     private var authStateListener: OnAuthStateListener? = null
@@ -34,7 +35,6 @@ class LoginFragment : Fragment() {
     }
 
     private val providers = arrayListOf(
-        AuthUI.IdpConfig.EmailBuilder().build(),
         AuthUI.IdpConfig.GoogleBuilder().build()
     )
 
@@ -60,9 +60,6 @@ class LoginFragment : Fragment() {
 
             FirebaseAuth.getInstance().currentUser?. also {
 
-                UserRepository().createUser(mapFromFirebaseUser(it))
-                UserRepository.currentUser = mapFromFirebaseUser(it)
-                //authStateListener?.onAuthStateChanged()
                 val action = LoginFragmentDirections.actionLoginFragment2ToTasksFragment()
                 findNavController().navigate(action)
             } ?: Toast.makeText(requireContext(), "Login error", Toast.LENGTH_SHORT).show()
