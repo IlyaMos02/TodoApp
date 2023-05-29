@@ -155,6 +155,7 @@ class TasksFragment() : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemCl
         }
 
         searchView.onQueryTextChanged { searchInput ->
+            viewModel.searchQuery = searchInput
             viewModel.onTaskSearched(searchInput)
         }
     }
@@ -175,6 +176,12 @@ class TasksFragment() : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemCl
             }
             TasksViewModel.HIDE_COMPLETED -> {
                 item.isChecked = !item.isChecked
+
+                if(item.isChecked){
+                    viewModel.onHideAllCompleted()
+                } else {
+                    viewModel.onSortTasksByImportance()
+                }
 
                 true
             }

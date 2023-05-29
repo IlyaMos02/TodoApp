@@ -15,7 +15,7 @@ class TaskRepository {
     private val taskDbRef = firestoreDb.collection("tasks")
     private val generalQuery = taskDbRef.whereEqualTo("user_id", FirebaseAuth.getInstance().currentUser!!.uid)
 
-    var tasks = MutableLiveData<List<Task>>()
+    val tasks = MutableLiveData<List<Task>>()
 
     init {
         getTasksSortedByImportance()
@@ -64,6 +64,14 @@ class TaskRepository {
         .get().addOnSuccessListener { result ->
             val list = result.toObjects<Task>()
             tasks.postValue(list.filter { it.name.contains(name) })
+        } .addOnFailureListener {
+            Log.e("Err", it.message.toString())
+        }
+
+    fun getTasksByHideCompleted() = generalQuery.orderBy("important", Query.Direction.DESCENDING)
+        .whereEqualTo("completed", false).get()
+        .addOnSuccessListener {result ->
+            tasks.postValue(result.toObjects<Task>())
         } .addOnFailureListener {
             Log.e("Err", it.message.toString())
         }

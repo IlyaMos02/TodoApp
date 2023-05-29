@@ -41,6 +41,12 @@ class TasksViewModel(private val taskRepository: TaskRepository
         }
     }
 
+    fun onHideAllCompleted(){
+        viewModelScope.launch {
+            taskRepository.getTasksByHideCompleted()
+        }
+    }
+
     fun onTaskSelected(task: Task){
         viewModelScope.launch {
             tasksEventChannel.send(TasksEvent.NavigateToEditTaskScreen(task))
