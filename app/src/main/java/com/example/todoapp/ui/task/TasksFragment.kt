@@ -3,13 +3,13 @@ package com.example.todoapp.ui.task
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.children
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,9 +18,9 @@ import com.example.todoapp.databinding.FragmentTasksBinding
 import com.example.todoapp.model.Task
 import com.example.todoapp.repository.TaskRepository
 import com.example.todoapp.utils.onQueryTextChanged
+import com.example.todoapp.utils.relaunch
 import com.firebase.ui.auth.AuthUI
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.FirebaseAuth
 
 class TasksFragment() : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemClickListener {
     private lateinit var binding: FragmentTasksBinding
@@ -174,13 +174,14 @@ class TasksFragment() : Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemCl
             }
             TasksViewModel.EXIT_FROM_ACCOUNT -> {
                 AuthUI.getInstance().signOut(requireContext()).addOnSuccessListener {
-                    val action = TasksFragmentDirections.actionTasksFragmentToLoginFragment2()
-                    findNavController().navigate(action)
-                    parentFragmentManager.beginTransaction().remove(this).commit()
+                    /*val action = TasksFragmentDirections.actionTasksFragmentToLoginFragment2()
+                    findNavController().navigate(action)*/
+                    relaunch()
+                    //parentFragmentManager.beginTransaction().remove(this).commit()
                 }
                 true
             }
-            else -> super.onContextItemSelected(item)
+            else -> false
         }
     }
 

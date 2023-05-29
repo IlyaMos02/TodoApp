@@ -43,6 +43,7 @@ class LoginFragment : Fragment() {
             .createSignInIntentBuilder()
             .setAvailableProviders(providers)
             .setLogo(R.drawable.ic_logo)
+            .setAlwaysShowSignInMethodScreen(true)
             .setIsSmartLockEnabled(false)
             .build()
 
